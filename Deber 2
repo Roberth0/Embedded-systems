@@ -1,0 +1,62 @@
+const int leds[6] = {2, 3, 4, 5, 6, 7};
+int i = 0;
+int j = 0;
+int k = 0;
+const int btn1 = 8;
+const int btn2 = 9;
+
+void setup() {
+  for (i = 0; i < 6; i++) {
+    pinMode(leds[i], OUTPUT);
+  }
+  pinMode(btn1, INPUT);
+  pinMode(btn2, INPUT);
+
+}
+
+void loop() {
+  if (digitalRead(btn1) == HIGH) {
+    delay(300);
+    for (i = 0; i < 8; i++) {
+      for (j = 0; j < 6; j++) {
+        digitalWrite(leds[j], HIGH);
+        delay(200);
+      }
+      for (k = 0; k < 6; k++) {
+        digitalWrite(leds[k], LOW);
+        delay(50);
+      }
+    }
+  } else {
+    if (digitalRead(btn2) == LOW) {
+      delay(300);
+      for (i = 0; i < 10; i++) { 
+          digitalWrite(leds[0], HIGH);
+          digitalWrite(leds[1], LOW);
+          digitalWrite(leds[2], LOW);
+          digitalWrite(leds[3], LOW);
+          digitalWrite(leds[4], LOW);
+          digitalWrite(leds[5], HIGH);
+          delay(500);
+          digitalWrite(leds[0], LOW);
+          digitalWrite(leds[1], HIGH);
+          digitalWrite(leds[2], LOW);
+          digitalWrite(leds[3], LOW);
+          digitalWrite(leds[4], HIGH);
+          digitalWrite(leds[5], LOW);
+          delay(500);
+          digitalWrite(leds[0], LOW);
+          digitalWrite(leds[1], LOW);
+          digitalWrite(leds[2], HIGH);
+          digitalWrite(leds[3], HIGH);
+          digitalWrite(leds[4], LOW);
+          digitalWrite(leds[5], LOW);
+          delay(500);     
+      }
+    } else {
+      for (i = 0; i < 6; i++) {
+        digitalWrite(leds[i], LOW);
+      }     
+      }
+  }
+}
