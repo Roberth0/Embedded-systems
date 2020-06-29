@@ -1,0 +1,228 @@
+//Display 7 segmentos Numeros del 0 al 9
+const int D = 11; //mas significativo
+const int C = 10;
+const int B = 9;
+const int A = 8; //menos significativo
+
+const int d = 7; //mas significativo
+const int c = 2;
+const int b = 1;
+const int a = 0; //menos significativo
+
+
+const int decenas = 13;
+const int unidades = 12;
+const int sensor1 = 6;
+const int sensor2 = 5;
+
+int dec;
+int uni;
+int dec2;
+int uni2;
+int count = 0;
+int day_count = 0;
+int entrance = 4;
+int way_out = 3;
+int alert = A0;
+
+void setup() {
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(a, OUTPUT);
+  pinMode(b, OUTPUT);
+  pinMode(c, OUTPUT);
+  pinMode(d, OUTPUT);
+  pinMode(decenas, OUTPUT);
+  pinMode(unidades, OUTPUT);
+  pinMode(entrance, OUTPUT);
+  pinMode(way_out, OUTPUT);
+  pinMode(alert, OUTPUT);
+
+}
+
+void loop() {
+
+
+  dec = count / 10; //15
+  uni = count - (dec * 10);
+  
+  dec2 = day_count / 10; //15
+  uni2 = day_count - (dec2 * 10);
+
+  digitalWrite(decenas, HIGH);
+  digitalWrite(unidades, LOW);
+
+  // Imprimir valor de decenas
+  segmentos(dec);
+  segmentos2(dec2);
+  delay(500);
+  digitalWrite(decenas, LOW);
+  digitalWrite(unidades, HIGH);
+
+  // Imprimir valor de Unidades
+  segmentos(uni);
+  segmentos2(uni2);
+  delay(100);
+  if (digitalRead(sensor1) == HIGH && digitalRead(sensor2) == LOW) {
+    digitalWrite(entrance, HIGH);
+    count++;
+    day_count++;
+
+  } else {
+    if ( digitalRead(sensor1) == LOW && digitalRead(sensor2) == HIGH) {
+      digitalWrite(way_out, HIGH);
+      count--;
+    } else {
+      digitalWrite(entrance, LOW);
+      digitalWrite(way_out, LOW);
+    }
+  }
+  if (count >= 30) {
+    digitalWrite(alert, HIGH);
+//    digitalWrite(way_out, HIGH);
+
+  } else {
+    digitalWrite(alert, LOW);
+//    digitalWrite(way_out, LOW);
+  }
+  delay(600);
+
+
+}
+
+
+void segmentos (int j) {
+  switch (j) {
+    case 0:
+      digitalWrite(D, LOW);
+      digitalWrite(C, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(A, LOW);
+      break;
+    case 1:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(A, LOW);
+      break;
+    case 2:
+      digitalWrite(D, LOW);
+      digitalWrite(C, HIGH);
+      digitalWrite(B, LOW);
+      digitalWrite(A, LOW);
+      break;
+    case 3:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(B, LOW);
+      digitalWrite(A, LOW);
+      break;
+    case 4:
+      digitalWrite(D, LOW);
+      digitalWrite(C, LOW);
+      digitalWrite(B, HIGH);
+      digitalWrite(A, LOW);
+      break;
+    case 5:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, LOW);
+      digitalWrite(B, HIGH);
+      digitalWrite(A, LOW);
+      break;
+    case 6:
+      digitalWrite(D, LOW);
+      digitalWrite(C, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(A, LOW);
+      break;
+    case 7:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(A, LOW);
+      break;
+    case 8:
+      digitalWrite(D, LOW);
+      digitalWrite(C, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(A, HIGH);
+      break;
+    case 9:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(A, HIGH);
+      break;
+
+  }
+
+}
+
+void segmentos2 (int i) {
+  switch (i) {
+    case 0:
+      digitalWrite(d, LOW);
+      digitalWrite(c, LOW);
+      digitalWrite(b, LOW);
+      digitalWrite(a, LOW);
+      break;
+    case 1:
+      digitalWrite(d, HIGH);
+      digitalWrite(c, LOW);
+      digitalWrite(b, LOW);
+      digitalWrite(a, LOW);
+      break;
+    case 2:
+      digitalWrite(d, LOW);
+      digitalWrite(c, HIGH);
+      digitalWrite(b, LOW);
+      digitalWrite(a, LOW);
+      break;
+    case 3:
+      digitalWrite(d, HIGH);
+      digitalWrite(c, HIGH);
+      digitalWrite(b, LOW);
+      digitalWrite(a, LOW);
+      break;
+    case 4:
+      digitalWrite(d, LOW);
+      digitalWrite(c, LOW);
+      digitalWrite(b, HIGH);
+      digitalWrite(a, LOW);
+      break;
+    case 5:
+      digitalWrite(d, HIGH);
+      digitalWrite(c, LOW);
+      digitalWrite(b, HIGH);
+      digitalWrite(a, LOW);
+      break;
+    case 6:
+      digitalWrite(d, LOW);
+      digitalWrite(c, HIGH);
+      digitalWrite(b, HIGH);
+      digitalWrite(a, LOW);
+      break;
+    case 7:
+      digitalWrite(d, HIGH);
+      digitalWrite(c, HIGH);
+      digitalWrite(b, HIGH);
+      digitalWrite(a, LOW);
+      break;
+    case 8:
+      digitalWrite(d, LOW);
+      digitalWrite(c, LOW);
+      digitalWrite(b, LOW);
+      digitalWrite(a, HIGH);
+      break;
+    case 9:
+      digitalWrite(d, HIGH);
+      digitalWrite(c, LOW);
+      digitalWrite(b, LOW);
+      digitalWrite(a, HIGH);
+      break;
+
+  }
+
+}
