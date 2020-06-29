@@ -1,0 +1,46 @@
+// Deber 3
+const int btn = 7;
+const int leds[6] = {8, 9, 10, 11, 12, 13};
+int numeroBinario[6] = {0, 0, 0, 0, 0, 0};
+int i;
+int j;
+int l;
+int cont = 0;
+int num = 0;
+int k;
+int nuevo_num;
+int numero;
+int m;
+int binario;
+
+void setup() {
+  for (i = 0; i < 6; i++) {
+    pinMode(leds[i], OUTPUT);
+  }
+  pinMode(btn, INPUT);
+}
+
+void loop() {
+  if (digitalRead(btn) == LOW) {
+    delay(100);
+    nuevo_num = cont;
+    for (m = 5; m >= 0 ; m--) {
+      numero = nuevo_num / 2;
+      binario = numero % 2;
+      numeroBinario[m] = binario;
+      nuevo_num = numero;
+    }
+    for (j = 0; j < 6; j++) {
+      if (numeroBinario[j] == 1) {
+        digitalWrite(leds[j], HIGH);
+      } else {
+        digitalWrite(leds[j], LOW);
+      }
+    }
+    cont++;
+    for (k = 0; k < 6; k++) {
+      numeroBinario[k] = 0;
+    }
+    delay(100);
+  } 
+}
