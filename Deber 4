@@ -1,0 +1,127 @@
+const int unidad = 12;
+const int decena = 13;
+
+const int A = 8;
+const int B = 9;
+const int C = 10;
+const int D = 11;
+
+int count = 2;
+int dec;
+int uni;
+int i;
+
+void setup() {
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(unidad, OUTPUT);
+  pinMode(decena, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if ( count < 100) {
+    if (isPrime(count)) {
+      Serial.println(count);
+
+      dec = count / 10;
+      uni = count - (dec * 10);
+      digitalWrite(decena, HIGH);
+      digitalWrite(unidad, LOW);
+      segmentos(dec);
+      delay(500);
+
+      digitalWrite(decena, LOW);
+      digitalWrite(unidad, HIGH);
+      segmentos(uni);
+      delay(500);
+      
+    } else {
+      digitalWrite(decena, LOW);
+      digitalWrite(unidad, LOW);
+    }
+    count++;
+    delay(20);
+  } else 
+    count = 2;
+}
+
+void segmentos (int j) {
+  switch (j) {
+    case 0:
+      digitalWrite(D, LOW);
+      digitalWrite(C, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(A, LOW);
+      break;
+    case 1:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(A, LOW);
+      break;
+    case 2:
+      digitalWrite(D, LOW);
+      digitalWrite(C, HIGH);
+      digitalWrite(B, LOW);
+      digitalWrite(A, LOW);
+      break;
+    case 3:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(B, LOW);
+      digitalWrite(A, LOW);
+      break;
+    case 4:
+      digitalWrite(D, LOW);
+      digitalWrite(C, LOW);
+      digitalWrite(B, HIGH);
+      digitalWrite(A, LOW);
+      break;
+    case 5:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, LOW);
+      digitalWrite(B, HIGH);
+      digitalWrite(A, LOW);
+      break;
+    case 6:
+      digitalWrite(D, LOW);
+      digitalWrite(C, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(A, LOW);
+      break;
+    case 7:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(A, LOW);
+      break;
+    case 8:
+      digitalWrite(D, LOW);
+      digitalWrite(C, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(A, HIGH);
+      break;
+    case 9:
+      digitalWrite(D, HIGH);
+      digitalWrite(C, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(A, HIGH);
+      break;
+
+  }
+
+}
+
+boolean isPrime(int numero) {
+  boolean prime = true;
+  for(int i = 2; i <= numero / 2; i++) { 
+    if(numero % i == 0) { 
+      prime = false; 
+      break;
+    }
+  }
+  return prime;
+}
