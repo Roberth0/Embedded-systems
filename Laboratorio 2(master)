@@ -1,0 +1,38 @@
+// Master
+# include <Wire.h>
+
+String message = "";
+String code = "";
+
+void setup() {
+  Wire.begin();
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    message = Serial.readString();
+    Serial.println("");
+    Serial.println(message + String("#"));
+
+    if (message == "activo")
+      code = "88FDBA";
+    else if (message == "noactivo")
+      code = "07EAC1";
+    else if (message == "estancado")
+      code = "EB09B1";
+    else if (message == "produccion")
+      code = "D09E8A";
+    else if (message == "planeacion")
+      code = "C47D01";
+    else
+      code = "00FF00";
+
+    Wire.beginTransmission(1);
+    Wire.write(code.c_str());
+    Wire.endTransmission();
+    Serial.println("");
+    delay(2000);
+    
+  }
+}
