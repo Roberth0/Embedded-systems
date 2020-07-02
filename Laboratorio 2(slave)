@@ -1,0 +1,56 @@
+// slave
+
+# include <Wire.h>
+# include <LiquidCrystal.h>
+LiquidCrystal lcd = {13, 12, 11, 10, 9, 8};
+
+char data;
+String code = "";
+String message = "";
+
+
+void setup() {
+  lcd.begin(16, 2);
+  Wire.begin(1);
+  Wire.onReceive(recieveEvent);
+  Serial.begin(9600);
+}
+
+void loop() {
+ 
+}
+void recieveEvent(int bytes) {
+  code = "";
+  lcd.clear();
+  while (Wire.available()) {
+    data = Wire.read();
+    code.concat(data);
+    Serial.println(code);  
+  }
+  lcd.setCursor(0, 0);
+  lcd.print("code:");
+  lcd.setCursor(6, 0);
+  lcd.print(code);
+
+  if (code == "88FDBA")
+    message = "activo";
+  else if (code == "07EAC1")
+    message = "noactivo";
+  else if (code == "EB09B1")
+    message = "estancado";
+  else if (code == "D09E8A")
+    message = "produccion";
+  else if (code == "C47D01")
+    message = "planeacion";
+  else 
+    message = "Error Code";
+
+  lcd.setCursor(0, 1);
+  lcd.print("msg:");
+  lcd.setCursor(4, 1);
+  lcd.print(message);
+  
+}
+
+
+
