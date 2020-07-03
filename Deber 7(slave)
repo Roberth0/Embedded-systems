@@ -1,0 +1,46 @@
+// slave
+
+# include <Wire.h>
+char data;
+const int leds[4] = {8, 9, 10, 11};
+
+void setup() {
+  for (int i = 0; i < 4; i++)
+    pinMode(leds[i], OUTPUT);
+  Wire.begin(1);
+  Wire.onReceive(receiveEvent);
+
+}
+
+void loop() {
+  switch (data) {
+    case 'a':
+      digitalWrite(leds[0], HIGH);
+      break;
+    case 'b':
+      digitalWrite(leds[1], HIGH);
+      break;
+    case 'c':
+      digitalWrite(leds[2], HIGH);
+      break;
+    case 'd':
+      digitalWrite(leds[3], HIGH);
+      break;
+    case 'h':
+      digitalWrite(leds[0], LOW);
+      digitalWrite(leds[1], LOW);
+      digitalWrite(leds[2], LOW);
+      digitalWrite(leds[3], LOW);
+      break;
+  }
+}
+
+void receiveEvent(int bytes) {
+  digitalWrite(leds[0], LOW);
+  digitalWrite(leds[1], LOW);
+  digitalWrite(leds[2], LOW);
+  digitalWrite(leds[3], LOW);
+  while (Wire.available()) {
+    data = Wire.read();
+  }
+}
