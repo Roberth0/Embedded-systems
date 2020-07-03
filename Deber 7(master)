@@ -1,0 +1,27 @@
+// master
+
+# include <Wire.h>
+const int switch1 = 13;
+const int switch2 = 12;
+const int switch3 = 11;
+const int switch4 = 10;
+char led[4] = {'a', 'b', 'c', 'd'};
+int vector[4] = {switch1, switch2, switch3, switch4};
+
+void setup() {
+  Wire.begin();
+  pinMode(switch1, INPUT);
+  pinMode(switch2, INPUT);
+  pinMode(switch3, INPUT);
+  pinMode(switch4, INPUT);
+}
+
+void loop() {
+  for (int i = 0; i < 4; i++) {
+    if (digitalRead(vector[i]) == LOW) {
+      Wire.beginTransmission(1);
+      Wire.write(led[i]);
+      Wire.endTransmission();
+    }    
+  } 
+}
