@@ -1,0 +1,58 @@
+# include <LiquidCrystal.h>
+LiquidCrystal lcd(13, 12, 11, 10, 9 , 8);
+
+int conversor;
+float voltaje;
+boolean min_speed = true;
+boolean max_speed = true;
+int mi_speed;
+int ma_speed;
+int count = 0;
+
+void setup() {
+  Serial.begin(9600);
+  lcd.begin(16, 2);
+}
+
+void loop() {
+  if (count < 1) {
+    Serial.println("Ingrese la velocidad minima");
+  }
+  while (min_speed) {
+
+    if (Serial.available() > 0) {
+      mi_speed = Serial.readString().toInt();
+      Serial.println(mi_speed);
+      min_speed = false;
+      count++;
+    }
+  }
+  if (count < 2) {
+    Serial.println("Ingrese la velocidad maxima");
+  }
+  while (max_speed) {
+
+    if (Serial.available() > 0) {
+      ma_speed = Serial.readString().toInt();
+      Serial.println(ma_speed);
+      max_speed = false;
+      count++;
+    }
+  }
+
+  conversor = analogRead(A0);
+  voltaje = (conversor * 5.0) / 1023.0;
+  int dutty = map(conversor, 0, 1023, mi_speed, ma_speed);
+  dutty = dutty / 4;
+  analogWrite(6, dutty);
+  Serial.println(dutty);
+  lcd.print("Cnv:" + String(conversor) + " ");
+  lcd.print("dty:");
+  lcd.print(dutty);
+  lcd.setCursor(0, 1);
+  lcd.print("Min:" + String(mi_speed / 4) + " ");
+  lcd.print("Max:" + String(ma_speed / 4));
+  delay(300);
+  lcd.clear();
+
+}
