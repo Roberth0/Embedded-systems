@@ -1,0 +1,164 @@
+#include <LiquidCrystal.h>
+#include <MsTimer2.h>
+
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
+
+int horero = 0;
+int minutero = 0;
+int segundero = 0;
+int count_encendido = 0;
+int count_modo = 0;
+int count = 0;
+const int leds[4] = {7, 6, 5, 4};
+int conversor1 = 0;
+int conversor2 = 0;
+int nuevo_horero = 0;
+int nuevo_minutero = 0;
+
+void setup() {
+  Serial.begin(9600);
+  lcd.begin(16, 2);
+  MsTimer2::set(8, reloj);
+  for (int i = 0; i < 4; i++)
+    pinMode(leds[i], OUTPUT);
+  attachInterrupt(0, interrupt_encendido, RISING);
+  attachInterrupt(1, interrupt_modo, RISING);
+}
+
+void loop() {
+  if (count_modo == 1) {
+    delay(10000);
+    int numero = random(0, 8);
+    Serial.println(numero);
+    switch (numero) {
+      case 0:
+        digitalWrite(leds[0], LOW);
+        digitalWrite(leds[1], HIGH);
+        digitalWrite(leds[2], LOW);
+        digitalWrite(leds[3], HIGH);
+        break;
+      case 1:
+        digitalWrite(leds[0], HIGH);
+        digitalWrite(leds[1], HIGH);
+        digitalWrite(leds[2], LOW);
+        digitalWrite(leds[3], HIGH);
+        break;
+      case 2:
+        digitalWrite(leds[0], HIGH);
+        digitalWrite(leds[1], LOW);
+        digitalWrite(leds[2], LOW);
+        digitalWrite(leds[3], HIGH);
+        break;
+      case 3:
+        digitalWrite(leds[0], HIGH);
+        digitalWrite(leds[1], HIGH);
+        digitalWrite(leds[2], LOW);
+        digitalWrite(leds[3], LOW);
+        break;
+      case 4:
+        digitalWrite(leds[0], HIGH);
+        digitalWrite(leds[1], HIGH);
+        digitalWrite(leds[2], HIGH);
+        digitalWrite(leds[3], HIGH);
+        break;
+      case 5:
+        digitalWrite(leds[0], LOW);
+        digitalWrite(leds[1], LOW);
+        digitalWrite(leds[2], HIGH);
+        digitalWrite(leds[3], LOW);
+        break;
+      case 6:
+        digitalWrite(leds[0], LOW);
+        digitalWrite(leds[1], HIGH);
+        digitalWrite(leds[2], LOW);
+        digitalWrite(leds[3], LOW);
+        break;
+      case 7:
+        digitalWrite(leds[0], LOW);
+        digitalWrite(leds[1], HIGH);
+        digitalWrite(leds[2], HIGH);
+        digitalWrite(leds[3], LOW);
+        break;
+    }
+  }
+  if (count_modo == 2) {
+    conversor1 = analogRead(A0);
+    conversor2 = analogRead(A1);
+    conversor1 = map(conversor1, 0, 1023, 0, 23);
+    conversor2 = map(conversor2, 0, 1023, 0, 59);
+    //Serial.println("change" + String(nuevo_horero));
+    horero = conversor1;
+    minutero = conversor2;
+    lcd.setCursor(4, 0);
+    lcd.print("Encendido");
+    lcd.setCursor(6, 1);
+    lcd.print(String(horero) + ":" + String(minutero) + ":" + String(segundero) + "  ");
+    count_modo++;
+    MsTimer2::start();
+
+  }
+}
+
+void interrupt_encendido() {
+  switch (count_encendido) {
+    case 0:
+      MsTimer2::start();
+      count_encendido++;
+      break;
+    case 1:
+      count_encendido++;
+      break;
+    case 2:
+      MsTimer2::stop();
+      count_encendido = 0;
+      count_modo = 0;
+      horero = 0;
+      minutero = 0;
+      segundero = 0;
+      lcd.clear();
+      break;
+  }
+}
+
+void interrupt_modo() {
+  if (count_encendido == 2) {
+    count_modo++;
+    switch (count_modo) {
+      case 1:
+        Serial.println("Modo 1 Seleccionado." );
+        break;
+      case 2:
+        Serial.println("Modo 2 Seleccionado.");
+        MsTimer2::stop();
+        break;
+      case 4:
+        Serial.println("Default");
+        count_modo = 0;
+        break;
+
+    }
+  }
+
+}
+
+void reloj() {
+  if (segundero == 60) {
+    minutero++;
+    segundero = 0;
+    lcd.clear();
+  }
+  if (minutero == 60) {
+    horero++;
+    minutero = 0;
+  }
+  if (horero == 24) {
+    horero = 0;
+    minutero = 0;
+    segundero = 0;
+  }
+  lcd.setCursor(4, 0);
+  lcd.print("Encendido");
+  lcd.setCursor(6, 1);
+  lcd.print(String(horero) + ":" + String(minutero) + ":" + String(segundero) + "  ");
+  segundero++;
+}
