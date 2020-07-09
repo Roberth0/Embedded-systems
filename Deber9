@@ -1,0 +1,123 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
+
+int count_encendido = 0;
+int count_modo = 0;
+int numero1;
+int numero2;
+int suma;
+
+void setup() {
+  lcd.begin(16, 3);
+  Serial.begin(9600);
+  attachInterrupt(0, encendido, RISING); // ON / MODE/ OFF
+  attachInterrupt(1, modo, RISING); // MODE SELECTION
+}
+
+void loop() {
+  if (count_encendido == 2 && count_modo == 1) {
+    Serial.println("Ingrese el primer digito");
+    boolean no_digit = true;
+    while (no_digit) {
+      if (Serial.available() > 0) {
+        numero1 = Serial.readString().toInt();
+        Serial.println("");
+        lcd.setCursor(0, 1);
+        lcd.print("N1:" + String(numero1)+ "  ");
+        no_digit = false;
+      }
+    }
+    boolean no_num = true;
+    Serial.println("Ingrese el segundo digito");
+    while (no_num) {
+      if (Serial.available() > 0) {
+        numero2 = Serial.readString().toInt();
+        Serial.println("");
+        lcd.setCursor(5, 1);
+        lcd.print(" N2:" + String(numero2)+ "  ");
+        no_num = false;
+      }
+    }
+    suma = numero1 + numero2;
+    lcd.setCursor(10, 1);
+    lcd.print(" R:" + String(suma));
+    count_modo++;
+  }
+
+  if (count_encendido == 2 && count_modo == 3) {
+    Serial.println("Ingrese el primer digito Resta");
+    boolean no_digit = true;
+    while (no_digit) {
+      if (Serial.available() > 0) {
+        numero1 = Serial.readString().toInt();
+        Serial.println("");
+        lcd.setCursor(0, 1);
+        lcd.print("N1:" + String(numero1)+ "  ");
+        no_digit = false;
+      }
+    }
+    boolean no_num = true;
+    Serial.println("Ingrese el segundo digito Resta");
+    while (no_num) {
+      if (Serial.available() > 0) {
+        numero2 = Serial.readString().toInt();
+        Serial.println("");
+        lcd.setCursor(5, 1);
+        lcd.print(" N2:" + String(numero2)+ "  ");
+        no_num = false;
+      }
+    }
+    suma = numero1 - numero2;
+    lcd.setCursor(10, 1);
+    lcd.print(" R:" + String(suma) + "  ");
+    count_modo++;
+  }
+}
+
+void encendido() {
+  count_encendido++;
+  switch (count_encendido) {
+    case 1:
+      lcd.print("Stma Iniciado");
+      break;
+    case 2:
+      lcd.clear();
+      lcd.print("Modo:None");
+      lcd.setCursor(0, 1);
+      lcd.print("Seleccion Modo");
+      break;
+    case 3:
+      lcd.clear();
+      count_encendido = 0;
+      suma = 0;
+      break;
+  }
+}
+
+void modo() {
+  if (count_encendido == 2) {
+    count_modo++;
+    switch (count_modo) {
+      case 1:
+        lcd.setCursor(5, 0);
+        lcd.print("Suma    ");
+        lcd.setCursor(0, 1);
+        lcd.print("                   ");
+        break;
+      case 3:
+        lcd.setCursor(5, 0);
+        lcd.print("Resta    ");
+        lcd.setCursor(0, 1);
+        lcd.print("                   ");
+        break;
+      case 5:
+        lcd.setCursor(5, 0);
+        lcd.print("None    ");
+        lcd.setCursor(0, 1);
+        lcd.print("Seleccion Modo   ");
+        count_modo = 0;
+        break;
+    }
+  }
+}
