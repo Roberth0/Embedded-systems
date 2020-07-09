@@ -15,8 +15,8 @@ boolean on;
 
 void setup() {
   lcd.begin(16, 2);
-  attachInterrupt(0, encendido, RISING);
-  attachInterrupt(1, set_alarm, RISING);
+  attachInterrupt(0, encendido, RISING); // ON/ OFF/
+  attachInterrupt(1, set_alarm, RISING); // Set alarm / Confirm alarm
 }
 
 void loop() {
