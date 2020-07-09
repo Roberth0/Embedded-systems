@@ -1,0 +1,111 @@
+#include <LiquidCrystal.h>
+#include <TimerOne.h>
+
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
+
+int count_encendido = 0;
+int count_alarm = 0;
+int new_horero = 0;
+int new_minutero = 0;
+int new_segundero = 0;
+int conversor1;
+int conversor2;
+int conversor3;
+boolean on;
+
+void setup() {
+  lcd.begin(16, 2);
+  attachInterrupt(0, encendido, RISING);
+  attachInterrupt(1, set_alarm, RISING);
+}
+
+void loop() {
+  if (count_encendido == 1 && count_alarm == 1) {
+    conversor1 = analogRead(A0);
+    conversor2 = analogRead(A1);
+    conversor3 = analogRead(A2);
+    conversor1 = map(conversor1, 0, 1023, 0, 23);
+    conversor2 = map(conversor2, 0, 1023, 0, 59);
+    conversor3 = map(conversor3, 0, 1023, 0, 59);
+    lcd.setCursor(5, 1);
+    lcd.print(String(conversor1) + ":" + String(conversor2) + ":" + String(conversor3) + "  ");
+    delay(300);
+    lcd.setCursor(5, 1);
+    lcd.print("               ");
+  }
+  
+  if (count_encendido == 1 && count_alarm == 2) {
+    if ((conversor1 == new_horero) && (conversor2 == new_minutero) && (conversor3 == new_segundero)) {
+      delay(1000);
+      for (int i = 0; i < 20; i++) {
+        lcd.setCursor(0, 0);
+        lcd.print(" Alarma!! ");
+        lcd.display();
+        delay(100);
+        lcd.noDisplay();
+        delay(100);
+      }
+      lcd.display();
+      count_alarm = 0;
+      delay(100);
+    }
+  }
+}
+
+void encendido() {
+  count_encendido++;
+  switch (count_encendido) {
+    case 1:
+      Timer1.initialize(1000000);
+      Timer1.attachInterrupt(reloj_alarma);
+      break;
+    case 2:
+    Timer1.stop();
+      lcd.clear();
+      new_horero = 0;
+      new_minutero = 0;
+      new_segundero = 0;
+      count_encendido = 0;
+      count_alarm = 0;
+      break;
+  }
+}
+
+void set_alarm() {
+  count_alarm++;
+  switch (count_alarm) {
+    case 1:
+      lcd.setCursor(0, 0);
+      lcd.print("Set Alarm     ");
+      break;
+    case 2:
+      lcd.setCursor(0, 0);
+      lcd.print("Alarm Activated");
+      break;
+  }
+}
+
+void reloj_alarma() {
+  if (new_segundero == 60) {
+    new_minutero++;
+    new_segundero = 0;
+  }
+  if (new_minutero == 60) {
+    new_horero++;
+    new_minutero = 0;
+  }
+  if (new_horero == 24) {
+    new_horero = 0;
+    new_minutero = 0;
+    new_segundero = 0;
+  }
+  if (count_alarm != 1) {
+    lcd.setCursor(0, 0);
+    lcd.print("                      ");
+    lcd.setCursor(4, 0);
+    lcd.print("Reloj");
+    lcd.setCursor(5, 1);
+    lcd.print(String(new_horero) + ":" + String(new_minutero) + ":" + String(new_segundero) + "  ");
+  }
+  new_segundero++;
+}
