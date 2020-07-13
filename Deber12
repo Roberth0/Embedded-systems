@@ -1,0 +1,22 @@
+# include <MsTimer2.h>
+# include <avr/wdt.h>
+
+int segundos = 0;
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("Working");
+  MsTimer2::set(1000, clock_one);
+  MsTimer2::start();
+}
+
+void loop() {
+}
+
+void clock_one() {
+  if (segundos == 20) { // retraso por simulacion 
+    wdt_disable();
+    wdt_enable(WDTO_1S);
+  }
+  segundos++;
+}
