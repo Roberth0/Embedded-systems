@@ -1,0 +1,209 @@
+# include <MsTimer2.h>
+# include <EEPROM.h>
+# include <avr/sleep.h>
+# include <avr/power.h>
+# include <avr/wdt.h>
+# include <TimerOne.h>
+# include <LiquidCrystal.h>
+LiquidCrystal lcd (13, 12, 11, 10, 9, 8);
+
+int count = 0;
+int seconds = 0;
+int segundero = 0;
+int minutero = 0;
+int horero = 0;
+int tiempo = 0;
+int ahorro = 0;
+int tiempo_respaldo;
+int respaldo_segundero = 0;
+int respaldo_minutero = 0;
+int activation_time = 20;
+String input_password;
+int count_encendido = 0;
+String password = "hola";
+boolean on;
+boolean pass = true;
+boolean alarm = false;
+boolean sensor = false;
+int leds[3] = {7, 6, 5};
+int sensores[3] = {14, 15, 16};
+
+
+void setup() {
+//  EEPROM.write(1, 0);
+//  EEPROM.write(2, 0);
+  set_sleep_mode(SLEEP_MODE_STANDBY);
+  attachInterrupt(0, encendido, LOW);
+  delay(1000);
+  sleep_mode();
+  sleep_disable();
+  lcd.begin(16, 2);
+  for ( int i = 0; i < 3; i++) {
+    pinMode(leds[i], OUTPUT);
+    pinMode(sensores[i], INPUT);
+  }
+  Serial.begin(9600);
+  Serial.println("Ingrese la clave");
+  MsTimer2::set(1000, reloj);
+
+}
+void loop() {
+
+  while (pass) {
+    if (Serial.available() > 0) {
+      input_password = Serial.readString();
+      Serial.println("");
+      pass = false;
+      count++;
+    }
+  }
+  if (count == 1) {
+    if (input_password == password) {
+      Serial.println("Correcto");
+      MsTimer2::start();
+      minutero = EEPROM.read(2);
+      seconds = EEPROM.read(1);
+      Timer1.initialize(1000000);
+      Timer1.attachInterrupt(timer_salida);
+      on = true;
+      count++;
+    } else {
+      Serial.println("Incorrecto");
+      Serial.println("Ingrese la clave");
+      pass = true;
+      count = 0;
+    }
+  }
+  if (alarm) {
+    if (seconds == 10 || seconds == 20 || seconds == 30 || seconds == 40 || seconds == 50 || seconds == 59) {
+      int luces = random(1, 5);
+      delay(1100);
+      Serial.println("Luces " + String(luces));
+      switch (luces) {
+        case 1:
+          digitalWrite(leds[0], HIGH);
+          digitalWrite(leds[1], HIGH);
+          digitalWrite(leds[2], HIGH);
+          break;
+        case 2:
+          digitalWrite(leds[0], HIGH);
+          digitalWrite(leds[1], LOW);
+          digitalWrite(leds[2], HIGH);
+          break;
+        case 3:
+          digitalWrite(leds[0], LOW);
+          digitalWrite(leds[1], HIGH);
+          digitalWrite(leds[2], HIGH);
+          break;
+        case 4:
+          digitalWrite(leds[0], LOW);
+          digitalWrite(leds[1], HIGH);
+          digitalWrite(leds[2], LOW);
+          break;
+      }
+    }
+    if (digitalRead(14) == HIGH) {
+      delay(400);
+      Serial.println("Sensor 1 Activado");
+      lcd.setCursor(12, 1);
+      lcd.print("S1");
+    }
+    if (digitalRead(15) == HIGH) {
+      delay(400);
+      Serial.println("Sensor 2 Activado");
+      lcd.setCursor(12, 1);
+      lcd.print("S2");
+    }
+    if (digitalRead(16) == HIGH) {
+      delay(400);
+      Serial.println("Sensor 3 Activado");
+      lcd.setCursor(12, 1);
+      lcd.print("S3");
+    }
+  }
+
+  if (ahorro == 1) {
+    lcd.clear();
+    pass = true;
+    count = 0;
+    digitalWrite(leds[0], LOW);
+    digitalWrite(leds[1], LOW);
+    digitalWrite(leds[2], LOW);
+    sleep_mode();
+    MsTimer2::stop();
+    sleep_disable();
+    Serial.println("Ingrese la clave");
+    segundero = 0;
+    activation_time = 20;
+    alarm = false;
+    sensor = false;
+    Timer1.stop();
+  }
+}
+
+void timer_salida() {
+  segundero++;
+  if (activation_time != 0) {
+    tiempo = activation_time - segundero;
+    lcd.setCursor(0, 0);
+    lcd.print("Activacion en " + String(tiempo) + " ");
+    if (tiempo == 0) {
+      activation_time = 0;
+    }
+  }
+  else {
+    lcd.setCursor(0, 0);
+    lcd.print("Alarm Activated        ");
+    alarm = true;
+    sensor = true;
+    //    Timer1.stop();
+  }
+}
+
+void reloj() {
+  if (seconds == 60) {
+    minutero++;
+    seconds = 0;
+  }
+  if (minutero == 60) {
+    horero++;
+    minutero = 0;
+  }
+  if (horero == 24) {
+    horero = 0;
+    minutero = 0;
+    seconds = 0;
+  }
+
+  if (tiempo_respaldo == 55) {
+    EEPROM.write(1, seconds);
+    EEPROM.write(2, minutero);
+    Serial.println("Hora guardada");
+    respaldo_segundero = EEPROM.read(1);
+    respaldo_minutero = EEPROM.read(2);
+    Serial.println(String(0) + ":" + String(respaldo_minutero) + ":" + String(respaldo_segundero) + "  ");
+    tiempo_respaldo = 0;
+  }
+
+  lcd.setCursor(0, 1);
+  lcd.print(String(horero) + ":" + String(minutero) + ":" + String(seconds) + "  ");
+  seconds++;
+  tiempo_respaldo++;
+}
+
+void encendido () {
+  count_encendido++;
+  switch (count_encendido) {
+    case 1:
+      Serial.println("Despierto");
+      break;
+    case 3:
+      Serial.println("Ahorro");
+      ahorro = 1;
+      break;
+    case 4:
+      count_encendido = 0;
+      ahorro = 0;
+      break;
+  }
+}
