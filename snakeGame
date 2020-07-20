@@ -1,0 +1,197 @@
+int x = 540;
+int letter;
+PVector pos;
+int bestScore = 0;
+int y = 360;
+int x_food;
+int y_food;
+int snake_size = 1;
+int width_window = 1080;
+int height_window = 720;
+int i;
+int j;
+boolean food = false;
+boolean gameOver = false;
+int count = 0;
+ArrayList<PVector> tail;
+int m = 0;
+PImage img, img2, img3;
+
+void setup() {
+  size(1080, 770);
+  frameRate(10);
+  img = loadImage("food.png");
+  img2 = loadImage("head.png");
+  img3 = loadImage("body.png");
+  tail = new ArrayList<PVector>();
+}
+
+void draw() {
+  if (!gameOver) {
+    background(0);
+    fill(255);
+    stroke(255, 0, 0);
+    rect(0, 720, 1080, 50);
+    fill(0);
+    textSize(30);
+    text("Puntaje:", 200, 755);
+    text("Mejor Puntaje:", 600, 755);
+    if (bestScore < snake_size) {
+      bestScore = snake_size;
+    }
+    text(bestScore - 1, 830, 755);
+
+    text(snake_size - 1, 325, 755);
+    stroke(0);
+    fill(255);
+    
+    rect(x, y, 20, 20);
+    for (PVector p : tail) {
+     
+      rect(p.x, p.y, 20, 20);
+    }
+    
+    switch (count) {
+    case 1:
+      if (x >= 0) {
+        pos = new PVector(x, y);
+        tail.add(pos.copy());
+        x = x - 20;
+        rect(x, y, 20, 20);
+        if ( tail.size() > snake_size - 1) {
+          tail.remove(0);
+        }
+      }
+      break;
+      
+    case 2:
+      if (y >= 0) {
+        pos = new PVector(x, y);
+        tail.add(pos.copy());
+        y = y - 20;
+        rect(x, y, 20, 20);
+        
+        if ( tail.size() > snake_size - 1) {
+          tail.remove(0);
+        }
+      }
+      break;
+      
+    case 3:
+      if (x <= 1060) {
+        pos = new PVector(x, y);
+        tail.add(pos.copy());
+        x = x + 20;
+        rect(x, y, 20, 20);
+      
+        if ( tail.size() > snake_size - 1) {
+          tail.remove(0);
+        }
+      }
+      break;
+      
+    case 4:
+      if (y <= 700) {
+        pos = new PVector(x, y);
+        tail.add(pos.copy());
+        y = y + 20;
+        rect(x, y, 20, 20);
+        if ( tail.size() > snake_size - 1) {
+          tail.remove(0);
+        }
+      }
+      break;     
+    }
+    if (!food) {
+      food();
+      food = true;
+    }
+    
+    fill(77, 255, 77);
+    image(img, x_food, y_food);
+    
+    if (x == x_food && y == y_food) {
+      snake_size++;
+      fill(0);
+      rect(x_food, y_food, 20, 20);
+      food = false;
+    }
+    for (PVector p : tail) {
+      if ( p.x == x && p.y == y) {
+        snake_size = 1;
+        tail = new ArrayList<PVector>();
+        gameOver = true;
+      } else {
+        if ( x < 0 || y < 0 || x > 1060 || y > 700) {
+          snake_size = 1;
+          tail = new ArrayList<PVector>();
+          gameOver = true;
+        }
+      }
+    }  
+  }
+
+  if (gameOver) {
+    fill(179, 179, 179);
+    rect(0, 0, 1080, 720);
+    fill(0);
+    textSize(50);
+    text("Game Over", 400, 720 / 2);
+    textSize(30);
+    text("Click para Jugar !", 400, 400);
+  }   
+}
+
+void keyPressed() {
+  switch (keyCode) {
+  case 37:
+    count = 1;
+    break;
+    
+  case 38:
+    count = 2;
+    break;
+    
+  case 39:
+    count = 3;
+    break;
+    
+  case 40:
+    count = 4;
+    break;
+    
+  case 80:
+    m++;
+    switch(m) {
+      case 1:
+        noLoop();
+        fill(217, 217, 217);
+        rect(0, 0, 1080, 720);
+        fill(0);
+        textSize(30);
+        text("Juego en Pausa", 450, 360);
+        break;
+        
+      case 2: 
+        loop();
+        m = 0;
+        break;
+    }
+    break;
+  }
+}
+
+void mouseReleased() {
+  if (mouseButton == LEFT) {
+    gameOver = false;
+    x = 540;
+    y = 360;
+  } else if (mouseButton == RIGHT) {
+    snake_size++;
+  }
+}
+
+void food() {
+  x_food = int(random(54)) * 20;
+  y_food = int(random(36)) * 20;
+}
