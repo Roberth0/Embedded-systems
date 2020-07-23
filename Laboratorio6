@@ -1,0 +1,125 @@
+# include "data.h"
+float test [10][5] = {
+  {5.3, 3.7, 1.5, 0.2, 1},
+  {5, 3.3, 1.4, 0.2, 1},
+  {5.5, 2.5, 4, 1.3, 2},
+  {5.5, 2.6, 4.4, 1.2, 2},
+  {6.1, 3, 4.6, 1.4, 2},
+  {6.2, 2.9, 4.3, 1.3, 2},
+  {5.1, 2.5, 3, 1.1, 2},
+  {5.7, 2.8, 4.1, 1.3, 2},
+  {6.9, 3.1, 5.4, 2.1, 3},
+  {6.7, 3.1, 5.6, 2.4, 3},
+};
+int testSize = (sizeof(test) / 4) / 5;
+float rendTotal;
+float test2[5];
+int j;
+int fil = 0;
+int col = 0;
+float distancia = 0;
+const int k = 9;
+float kvector[k];
+int i;
+int etiquetak[k];
+float distanciak[90];
+float distanciak2[90];
+int count = 0;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (count < 10) {
+    dataKNN(count);
+    printArray(test2, 5, "Data: ");
+    for (fil = 0; fil < 90; fil ++) {
+      for (col = 0; col < 4; col++) {
+        // Distance
+        distancia = distancia + pow(matriz[fil][col] - test2[col], 2);
+      }
+      distancia = sqrt(distancia);
+      distanciak[fil] = distancia;
+      distanciak2[fil] = distancia;
+      //      Serial.println(String(fil) + ":" + String(distancia));
+    }
+    ordenar(distanciak, 90);
+    //    printArray(distanciak, 90);
+    for (int m = 0; m < k; m++) {
+      kvector[m] = distanciak[m];
+      float dato = kvector[m];
+      for (fil = 0; fil < 90; fil++) {
+        if (dato == distanciak2[fil]) {
+          Serial.println("  Match Found: " + String(dato));
+          Serial.println("    Valor Matriz: " + String(matriz[fil][4]));
+          etiquetak[m] = matriz[fil][4];
+        }
+      }
+    }
+    Serial.println("Los " + String(k) + " vecinos mas cercanos son:");;
+    printArray(kvector, k, "Neighboors: ");
+    //    Serial.println("Etiquetas Vecinos");
+    //    printArray2(etiquetak, k);
+
+    int y = test2[4];
+    if ( y == etiquetak[0] ) {
+      Serial.println("Acierto, Valor Obtenido: " + String(y) + "; Valor Esperado: " + String(etiquetak[0]));
+    } else {
+      Serial.println("Error, Valor Obtenido: " + String(y) + "; Valor Esperado :" + String(etiquetak[0]));
+    }
+    rendTotal = rendTotal + rendimiento();
+    delay(3000);
+    count++;
+  }
+  if (count == 10) {
+    Serial.println();
+    Serial.println( "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ " );
+    Serial.println( "Rendimiento Total: " + String((rendTotal / testSize) * 100) + "%." );
+    Serial.println( "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ " );
+    count++;
+  }
+}
+
+void dataKNN(int x) {
+  for (i = 0; i < 5; i++) {
+    test2[i] = test[x][i];
+  }
+}
+
+void ordenar(float *a, int n) {
+  for (int i = 1; i < n; ++i) {
+    float j = a[i];
+    int h;
+    for (h = i - 1; (h >= 0) && (j < a[h]); h--) {
+      a[h + 1] = a[h];
+    }
+    a[h + 1] = j;
+  }
+}
+
+void printArray(float *a, int n, String h) {
+  Serial.print(h);
+  for (int i = 0; i < n; i++) {
+    Serial.print(a[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
+}
+
+float rendimiento() {
+  float valor = 0;
+  for ( i = 0; i < k; i++ ) {
+    if (test2[4] == etiquetak[i]) {
+      valor++;
+    }
+  }
+  valor = ( valor / k ) * 100;
+  Serial.println( "#####################################" );
+  Serial.println( "Rendimiento: " + String(valor) + "%." );
+  Serial.println( "#####################################" );
+  Serial.println("");
+  Serial.println("");
+
+  return valor / 100;
+}
